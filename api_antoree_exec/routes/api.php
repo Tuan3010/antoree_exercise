@@ -18,5 +18,5 @@ Route::middleware('is_auth')->prefix('admin/user')->group(function () {
     Route::get('/{userId}', [UserController::class,'showUser']);
     Route::post('/store', [UserController::class,'storeUser'])->middleware('role:supper_admin');
     Route::put('/edit/{userId}', [UserController::class,'editUser']);
-    Route::delete('/destroy/{userId}', [UserController::class,'destroyUser'])->middleware('role:user');
+    Route::delete('/destroy/{userId}', [UserController::class,'destroyUser'])->middleware('role:supper_admin,admin');
 });

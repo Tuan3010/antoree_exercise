@@ -41,17 +41,21 @@ class AuthController extends Controller
             if (!$token) {
                 return apiResponse(Message::ERROR, null, Response::HTTP_BAD_REQUEST);
             }
-
-            return apiResponse(Message::SUCCESS, $token, Response::HTTP_OK);
+            $user = auth()->user()->makeHidden(['password']);
+            
+            return apiResponse(Message::SUCCESS, [
+                'token' => $token,
+                'user'  => $user
+            ], Response::HTTP_OK);
 
         } catch (ValidationException $e) {
             return apiResponse($e->validator->errors()->first(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
 
         } catch (JWTException  $e) {
-            return apiResponse('Lỗi token !', null, Response::HTTP_UNPROCESSABLE_ENTITY);
+            return apiResponse('Lỗi token !', null, Response::HTTP_BAD_REQUEST);
 
         } catch (Exception  $e) {
-            return apiResponse(Message::ERROR, null, Response::HTTP_UNPROCESSABLE_ENTITY);
+            return apiResponse(Message::ERROR, null, Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
         
@@ -68,21 +72,17 @@ class AuthController extends Controller
             );
 
             $user = $this->authService->registerUser($credentials);
-            $token = JWTAuth::fromUser($user);
 
-            return apiResponse(Message::CREATED_SUCCESS, [
-                'user' => $user,
-                'token' => $token
-            ], Response::HTTP_CREATED);
+            return apiResponse(Message::CREATED_SUCCESS, $user, Response::HTTP_CREATED);
             
         } catch (ValidationException $e) {
             return apiResponse($e->validator->errors()->first(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
 
         } catch (JWTException  $e) {
-            return apiResponse('Lỗi token !', null, Response::HTTP_UNPROCESSABLE_ENTITY);
+            return apiResponse('Lỗi token !', null, Response::HTTP_BAD_REQUEST);
 
         } catch (Exception  $e) {
-            return apiResponse(Message::ERROR, null, Response::HTTP_UNPROCESSABLE_ENTITY);
+            return apiResponse(Message::ERROR, null, Response::HTTP_INTERNAL_SERVER_ERROR);
 
         }
     }

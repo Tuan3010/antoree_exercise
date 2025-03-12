@@ -24,6 +24,8 @@ class UserRule
                 Rule::unique('users','email')->ignore($userId)
             ],
             'role' => 'in:'. implode(',', Role::getValues()),
+            'age' => 'max:100|min:10|integer',
+            'phone' => 'regex:/^0[1-9][0-9]{8,9}$/'
         ];
     }
 
@@ -45,7 +47,13 @@ class UserRule
             'password.required' => 'Mật khẩu là bắt buộc.',
             'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
 
-            'role.in' => 'Role không hợp lệ'
+            'role.in' => 'Role không hợp lệ',
+
+            'age.max' => 'Tuổi không được phép lớn hơn 100.',
+            'age.min' => 'Tuổi tối thiểu phải là 10.',
+            'age.interger' => 'Tuổi không hợp lệ',
+
+            'phone' => 'Số điện thoại không hợp lệ',
             
         ];
     }

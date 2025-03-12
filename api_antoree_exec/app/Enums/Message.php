@@ -16,4 +16,5 @@ final class Message extends Enum
     const CREATED_SUCCESS = 'Tạo mới thành công!';
     const UPDATED_SUCCESS = 'Cập nhật thành công!';
     const DELETED_SUCCESS = 'Xóa thành công!';
+    const DELETED_FAILURE = 'Xóa thất bại';
 }

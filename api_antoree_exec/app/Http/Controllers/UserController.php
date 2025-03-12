@@ -66,9 +66,10 @@ class UserController extends Controller
     {
         try {
             $response = User::find($userId);
-            return response()->json($response);
+            return apiResponse(Message::SUCCESS_RECORD, $response, Response::HTTP_OK);
+
         } catch (\Throwable $th) {
-            return response()->json($th);
+            return apiResponse(Message::ERROR, null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -79,23 +80,23 @@ class UserController extends Controller
     {
         $user = User::find($userId);
         if (!$user) {
-            return response()->json(['message' => 'Người dùng không tồn tại']);
+            return apiResponse(Message::NOT_FOUND, null, Response::HTTP_NOT_FOUND);
         }
 
         try {
             $credentials = $request->validate(
-                UserRule::userRules($userId)
+                UserRule::userRules($userId),
+                UserRule::userMessages()
             );
 
             $response = $this->userService->updateUser($credentials, $userId);
 
-            return response()->json(['message' => 'Sửa thành công !']);
+            return apiResponse(Message::UPDATED_SUCCESS, null, Response::HTTP_OK);
 
         } catch (ValidationException $e) {
-            return response()->json([
-                'errors' => $e->validator->errors()->first()
-            ], 422);
-        }
+            return apiResponse($e->validator->errors()->first(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        } 
         
 
     }
@@ -106,26 +107,27 @@ class UserController extends Controller
     public function destroyUser(int $userId)
     {
         $selfUser = auth()->user();
-        $user = User::find($userId);
-
-        if (!$user) {
-            return response()->json(['message' => 'Người dùng không tồn tại'],404);
-        }
-
-        if ($selfUser->id === $user->id) {
-            return response()->json(['message' => 'Bạn không thể xóa chính mình'],404);
-        }
-
-        if ($selfUser->role == $user->role || $user->role == Role::SUPPERADMIN) {
-            return response()->json(['message' => 'Bạn không có quyền xóa admin khác'],404);
-        }
-
         try {
+
+            $user = User::find($userId);
+            if (!$user) {
+                return apiResponse(Message::NOT_FOUND, null, Response::HTTP_NOT_FOUND);
+            }
+    
+            if ($selfUser->id === $user->id) {
+                return apiResponse(Message::DELETED_FAILURE, null, Response::HTTP_BAD_REQUEST);
+            }
+    
+            if ($selfUser->role == $user->role || $user->role == Role::SUPPERADMIN) {
+                return apiResponse(Message::DELETED_FAILURE, null, Response::HTTP_BAD_REQUEST);
+            }
+
             $user->delete();
-            return response()->json(['message' => 'Xóa thành công !']);
+            return apiResponse(Message::SUCCESS, null, Response::HTTP_OK);
 
         } catch (\Throwable $th) {
-            return response()->json(['message' => '505']);
+            return apiResponse(Message::ERROR, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+
         }
     }
 }
