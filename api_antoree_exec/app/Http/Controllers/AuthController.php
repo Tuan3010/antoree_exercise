@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Rules\UserRule;
+use Illuminate\Support\Facades\Auth;
+use App\Rules\AuthRule;
 use Illuminate\Validation\ValidationException;
 use App\Services\AuthService;
+use Exception;
+use Illuminate\Http\Response;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -22,30 +28,62 @@ class AuthController extends Controller
     }
 
     // [POST]::/api/login
-    public function login(Request $request) {
-        // echo($request);
-        return response()->json('Login hanle');
+    public function login(Request $request) 
+    {
+        try {
+            $credentials = $request->validate(
+                AuthRule::loginRules(),
+                AuthRule::loginMessages()
+            );
+
+            $token = JWTAuth::attempt($credentials);
+
+            if (!$token) {
+                return apiResponse(Message::ERROR, null, Response::HTTP_BAD_REQUEST);
+            }
+
+            return apiResponse(Message::SUCCESS, $token, Response::HTTP_OK);
+
+        } catch (ValidationException $e) {
+            return apiResponse($e->validator->errors()->first(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        } catch (JWTException  $e) {
+            return apiResponse('Lỗi token !', null, Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        } catch (Exception  $e) {
+            return apiResponse(Message::ERROR, null, Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        }
+        
+        
     }
 
-    /**
-     * @param $request
-     * @return array
-     */
+    // [POST]::/api/register
     public function register(Request $request): mixed
     {
         try {
             $credentials = $request->validate(
-                UserRule::userRules()
+                AuthRule::registerRules(),
+                AuthRule::registerMessages()
             );
 
-            $this->authService->registerUser($credentials);
+            $user = $this->authService->registerUser($credentials);
+            $token = JWTAuth::fromUser($user);
 
-            return response()->json(['message' => 'Đăng kí thành công !']);
+            return apiResponse(Message::CREATED_SUCCESS, [
+                'user' => $user,
+                'token' => $token
+            ], Response::HTTP_CREATED);
             
         } catch (ValidationException $e) {
-            return response()->json([
-                'errors' => $e->validator->errors()->first()
-            ], 422);
+            return apiResponse($e->validator->errors()->first(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        } catch (JWTException  $e) {
+            return apiResponse('Lỗi token !', null, Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        } catch (Exception  $e) {
+            return apiResponse(Message::ERROR, null, Response::HTTP_UNPROCESSABLE_ENTITY);
+
         }
     }
 

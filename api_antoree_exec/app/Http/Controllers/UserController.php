@@ -7,6 +7,10 @@ use App\Models\User;
 use App\Rules\UserRule;
 use App\Services\UserService;
 use Illuminate\Validation\ValidationException;
+use App\Enums\Role;
+use App\Enums\Message;
+use Exception;
+use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
@@ -28,10 +32,10 @@ class UserController extends Controller
     {
         try {
             $users = User::all();
-
-            return response()->json($users);
-        } catch (\Throwable $th) {
-            return response()->json('404');
+            return apiResponse(Message::SUCCESS_RECORD, $users, Response::HTTP_OK);
+            
+        } catch (Exception $e) {
+            return apiResponse($e->getMessage(), null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -48,22 +52,20 @@ class UserController extends Controller
 
             $this->userService->createUser($credentials);
 
-            return response()->json($credentials);
-            
+            return apiResponse(Message::CREATED_SUCCESS, $credentials, Response::HTTP_CREATED);
         } catch (ValidationException $e) {
-            return response()->json([
-                'errors' => $e->validator->errors()->first()
-            ], 422);
+
+            return apiResponse($e->validator->errors()->first(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 
     /**
      * Display the specified resource.
      */
-    public function showUser(string $id)
+    public function showUser(string $userId)
     {
         try {
-            $response = User::find($id);
+            $response = User::find($userId);
             return response()->json($response);
         } catch (\Throwable $th) {
             return response()->json($th);
@@ -101,11 +103,21 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroyUser(int $id)
+    public function destroyUser(int $userId)
     {
-        $user = User::find($id);
+        $selfUser = auth()->user();
+        $user = User::find($userId);
+
         if (!$user) {
             return response()->json(['message' => 'Người dùng không tồn tại'],404);
+        }
+
+        if ($selfUser->id === $user->id) {
+            return response()->json(['message' => 'Bạn không thể xóa chính mình'],404);
+        }
+
+        if ($selfUser->role == $user->role || $user->role == Role::SUPPERADMIN) {
+            return response()->json(['message' => 'Bạn không có quyền xóa admin khác'],404);
         }
 
         try {

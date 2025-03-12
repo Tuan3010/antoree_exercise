@@ -5,23 +5,22 @@ namespace App\Rules;
 use Illuminate\Validation\Rule;
 use App\Enums\Role;
 
-class UserRule
+class AuthRule
 {
-    public static function userRules($userId = null): array
+    public static function registerRules(): array
     {
-
         return [
             'name' => [
                 'required',
-                Rule::unique('users','name')->ignore($userId),
+                'unique:users,name',
                 'max:30',
                 'min:8',
             ],
-            'password' => $userId ? 'min:8|max:30' : 'required|min:8|max:30',
+            'password' => 'required|min:6|max:30',
             'email' => [
                 'required',
                 'email',
-                Rule::unique('users','email')->ignore($userId)
+                'unique:users,email'
             ],
             'role' => 'in:'. implode(',', Role::getValues()),
         ];
@@ -30,12 +29,12 @@ class UserRule
     /**
      * @return array
      */
-    public static function userMessages(): array
+    public static function registerMessages(): array
     {
         return [
             'name.required' => 'Tên là bắt buộc.',
             'name.max' => 'Tên không được dài quá 30 ký tự.',
-            'name.min' => 'Tên không được ít hơn 8 ký tự',
+            'name.min' => 'Tên ít nhất phải 8 ký tự',
             'name.unique' => 'Tên này đã được sử dụng.',
             
             'email.required' => 'Email là bắt buộc.',
@@ -47,6 +46,28 @@ class UserRule
 
             'role.in' => 'Role không hợp lệ'
             
+        ];
+    }
+
+
+    public static function loginRules(): array
+    {
+        return [
+            'name' => 'required|min:8|max:30',
+            'password' => 'required|min:6|max:30',
+        ];
+    }
+
+    public static function loginMessages(): array
+    {
+        return [
+            'name.required' => 'Không bỏ trống trường name.',
+            'name.max' => 'Tên không được dài quá 30 ký tự.',
+            'name.min' => 'Tên ít nhất phải 8 ký tự',
+
+            'password.required' => 'Mật khẩu là bắt buộc.',
+            'password.max' => 'Mật khẩu không được dài quá 30 ký tự.',
+            'password.min' => 'Mật khẩu ít nhất phải 6 ký tự',
         ];
     }
 }
