@@ -78,9 +78,21 @@ class UserController extends Controller
      */
     public function editUser(Request $request, int $userId)
     {
+        $selfUser = auth()->user();
         $user = User::find($userId);
         if (!$user) {
             return apiResponse(Message::NOT_FOUND, null, Response::HTTP_NOT_FOUND);
+        }
+
+        if ($selfUser->role == $user->role || $user->role == Role::SUPPERADMIN) {
+            return apiResponse(Message::UPDATED_ROLE, null, Response::HTTP_FORBIDDEN);
+        }
+        
+        if ($selfUser->id === $user->id && 
+            $selfUser->role === Role::SUPPERADMIN ||
+            $selfUser->role === Role::ADMIN
+        ) {
+            return apiResponse(Message::CHANGE_ROLE, null, Response::HTTP_FORBIDDEN);
         }
 
         try {
@@ -115,11 +127,11 @@ class UserController extends Controller
             }
     
             if ($selfUser->id === $user->id) {
-                return apiResponse(Message::DELETED_FAILURE, null, Response::HTTP_BAD_REQUEST);
+                return apiResponse(Message::DELETED_SELF_ERROR, null, Response::HTTP_BAD_REQUEST);
             }
     
             if ($selfUser->role == $user->role || $user->role == Role::SUPPERADMIN) {
-                return apiResponse(Message::DELETED_FAILURE, null, Response::HTTP_BAD_REQUEST);
+                return apiResponse(Message::DELETED_ADMIN_ERROR, null, Response::HTTP_FORBIDDEN);
             }
 
             $user->delete();

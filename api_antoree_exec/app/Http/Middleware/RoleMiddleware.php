@@ -21,7 +21,7 @@ class RoleMiddleware
         $user = JWTAuth::parseToken()->authenticate();
         
         if (!in_array($user->role, $roles)) {
-            return apiResponse(Message::UNAUTHORIZED, null, Response::HTTP_UNAUTHORIZED);
+            return apiResponse(Message::FORBIDDEN, null, Response::HTTP_FORBIDDEN);
         }
         
         return $next($request);

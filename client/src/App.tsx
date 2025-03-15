@@ -4,7 +4,11 @@ import RegisterPage from "./pages/Register";
 import Dashboard from './pages/users/dashboard/Dashboard';
 import CreatePage from './pages/users/create/Create';
 import EditPage from './pages/users/edit/Edit';
-import PrivateRoute from './components/protectedRoute';
+import PrivateRoute from './components/PrivateRoute';
+import NotFound from "./pages/NotFound";
+import Header from "./components/Header";
+
+
 
 function App() {
 
@@ -15,12 +19,14 @@ function App() {
         <Route path='/register' element={<RegisterPage />} />
 
         <Route element={<PrivateRoute />}>
-          <Route path='/dashboard' element={<Dashboard />} />
-          <Route path='user/create' element={<CreatePage />} />
-          <Route path='user/edit' element={<EditPage />} />
+          
+            <Route path='/dashboard' element={<Dashboard />} />
+            <Route path='user/create' element={<CreatePage />} />
+            <Route path='user/edit/:id' element={<EditPage />} />
+          
         </Route>
 
-        <Route path="*" element={<LoginPage />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   )

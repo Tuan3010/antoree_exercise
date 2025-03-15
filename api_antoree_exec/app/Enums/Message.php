@@ -15,6 +15,11 @@ final class Message extends Enum
     const VALIDATION_ERROR = 'Dữ liệu không hợp lệ!';
     const CREATED_SUCCESS = 'Tạo mới thành công!';
     const UPDATED_SUCCESS = 'Cập nhật thành công!';
+    const UPDATED_ROLE = 'Vai trò của bạn không được chỉnh sửa thông tin người này !';
     const DELETED_SUCCESS = 'Xóa thành công!';
-    const DELETED_FAILURE = 'Xóa thất bại';
+    const DELETED_FAILURE = 'Xóa thất bại!';
+    const DELETED_SELF_ERROR = 'Không thể xóa chính mình!';
+    const DELETED_ADMIN_ERROR = 'Không thể xóa người quản trị khác!';
+    const CHANGE_ROLE = ' Admin không thể thay đổi vai trò của chính mình.';
+    
 }

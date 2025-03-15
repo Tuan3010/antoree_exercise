@@ -49,7 +49,7 @@ class AuthController extends Controller
             ], Response::HTTP_OK);
 
         } catch (ValidationException $e) {
-            return apiResponse($e->validator->errors()->first(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
+            return apiResponse($e->validator->errors(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
 
         } catch (JWTException  $e) {
             return apiResponse('Lỗi token !', null, Response::HTTP_BAD_REQUEST);
@@ -63,28 +63,28 @@ class AuthController extends Controller
     }
 
     // [POST]::/api/register
-    public function register(Request $request): mixed
-    {
-        try {
-            $credentials = $request->validate(
-                AuthRule::registerRules(),
-                AuthRule::registerMessages()
-            );
+        public function register(Request $request): mixed
+        {
+            try {
+                $credentials = $request->validate(
+                    AuthRule::registerRules(),
+                    AuthRule::registerMessages()
+                );
 
-            $user = $this->authService->registerUser($credentials);
+                $user = $this->authService->registerUser($credentials);
 
-            return apiResponse(Message::CREATED_SUCCESS, $user, Response::HTTP_CREATED);
-            
-        } catch (ValidationException $e) {
-            return apiResponse($e->validator->errors()->first(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
+                return apiResponse(Message::CREATED_SUCCESS, $user, Response::HTTP_CREATED);
+                
+            } catch (ValidationException $e) {
+                return apiResponse($e->validator->errors(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
 
-        } catch (JWTException  $e) {
-            return apiResponse('Lỗi token !', null, Response::HTTP_BAD_REQUEST);
+            } catch (JWTException  $e) {
+                return apiResponse('Lỗi token !', null, Response::HTTP_BAD_REQUEST);
 
-        } catch (Exception  $e) {
-            return apiResponse(Message::ERROR, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            } catch (Exception  $e) {
+                return apiResponse(Message::ERROR, null, Response::HTTP_INTERNAL_SERVER_ERROR);
 
+            }
         }
-    }
 
 }

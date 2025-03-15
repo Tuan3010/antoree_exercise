@@ -23,7 +23,7 @@ class AuthMiddleware
             return $next($request);
     
         } catch (Exception $e) {
-            return apiResponse(Message::FORBIDDEN, null, Response::HTTP_FORBIDDEN);
+            return apiResponse(Message::UNAUTHORIZED, null, Response::HTTP_UNAUTHORIZED);
         }
     }
 }
