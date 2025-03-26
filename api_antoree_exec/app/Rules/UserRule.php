@@ -17,7 +17,7 @@ class UserRule
                 'max:30',
                 'min:8',
             ],
-            'password' => $userId ? 'min:8|max:30' : 'required|min:8|max:30',
+            'password' => $userId ? 'min:6|max:30' : 'required|min:6|max:30',
             'email' => [
                 'required',
                 'email',

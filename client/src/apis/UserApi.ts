@@ -1,4 +1,4 @@
-import axiosInstance from "./axiosConfig";
+import axiosInstance from "./AxiosConfig";
 
 const userApi = {
 
@@ -20,18 +20,18 @@ const userApi = {
         }
     },
 
-    createUser: async () => {
+    createUser: async (inputs) => {
         try {
-            const response = await axiosInstance.post(`api/admin/user/store`);
+            const response = await axiosInstance.post(`api/admin/user/store`, inputs);
             return response.data;
         } catch (error) {
             throw error;
         }
     },
 
-    updateUser: async (userId) => {
+    updateUser: async (userId, inputs) => {
         try {
-            const response = await axiosInstance.put(`api/admin/user/edit/${userId}`);
+            const response = await axiosInstance.put(`api/admin/user/edit/${userId}`, inputs);
             return response.data;
         } catch (error) {
             throw error;

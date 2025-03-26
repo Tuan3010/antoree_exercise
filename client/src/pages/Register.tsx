@@ -8,7 +8,7 @@ import {
   Box,
 } from "@mui/material";
 
-import authApi from '../apis/authApi';
+import authApi from '../apis/AuthApi';
 
 export default function RegisterPage() {
     const [formData, setFormData] = useState({

@@ -1,4 +1,4 @@
-import axiosInstance from "./axiosConfig";
+import axiosInstance from "./AxiosConfig";
 
 const authApi = {
     login: async (credentials) => {
@@ -17,6 +17,10 @@ const authApi = {
         } catch (error) {
             throw error;
         }
+    },
+
+    logout: () => {
+        localStorage.removeItem("access_token");
     }
 }
 

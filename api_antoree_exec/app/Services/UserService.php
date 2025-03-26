@@ -30,6 +30,18 @@ class UserService
             'created_at' => now(),
         ];
 
+        if (isset($credentials['age'])) {
+            $data['age'] = $credentials['age'];
+        }
+
+        if (isset($credentials['phone'])) {
+            $data['phone'] = $credentials['phone'];
+        }
+
+        if (isset($credentials['role'])) {
+            $data['role'] = $credentials['role'];
+        }
+
         return $this->userRepo->createUserRepo($data);
     }
 

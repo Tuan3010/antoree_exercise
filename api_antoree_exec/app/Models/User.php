@@ -57,6 +57,13 @@ class User extends Authenticatable implements JWTSubject
     
     // Trả về các claims bổ sung nếu có
     public function getJWTCustomClaims() {
-        return [];
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'role' => $this->role,
+            'phone' => $this->phone,
+            'age' => $this->age
+        ];
     }
 }

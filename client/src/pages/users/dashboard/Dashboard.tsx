@@ -6,16 +6,16 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { useEffect, useState } from 'react';
-import userApi from '../../../apis/userApi';
+import userApi from '../../../apis/UserApi';
 import { Button } from '@mui/material';
 import DeleteBtn from '../../../components/DeleteBtn';
 import { Link } from 'react-router-dom';
 
 
-
 export default function BasicTable() {
+    
     const [users, setUsers] = useState([]);
-
+    
     useEffect(() => {
         userApi.getAllUser()
             .then(res => {
@@ -23,7 +23,7 @@ export default function BasicTable() {
             })
             .catch(err => {
                 console.log(err)
-                alert('Lỗi hệ thống !');
+                // alert('Lỗi hệ thống !');
             })
     },[])
 
@@ -35,6 +35,8 @@ export default function BasicTable() {
         alert(error.response.data.message);
       }
     }
+
+   
 
   return (
     <TableContainer component={Paper} sx={{maxWidth: 900, margin: 'auto', marginTop: '30px'}}>
@@ -60,7 +62,15 @@ export default function BasicTable() {
               <TableCell align="right">{user.role}</TableCell>
               <TableCell align="right">
                     
-                    <Button variant="contained" color='primary' LinkComponent={Link} to={`/user/edit/${user.id}`}>Sửa</Button>
+                    <Button 
+                      variant="contained" 
+                      color='primary' 
+                      LinkComponent={Link} 
+                      to={`/user/edit/${user.id}`}
+                      // onClick={() => handleEdit(user.id)}
+                    >
+                      Sửa
+                    </Button>
                     <DeleteBtn  onDelete={() => handleDelete(user.id)}/>
               </TableCell>
             </TableRow>

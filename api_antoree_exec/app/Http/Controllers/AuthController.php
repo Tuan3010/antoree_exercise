@@ -39,7 +39,7 @@ class AuthController extends Controller
             $token = JWTAuth::attempt($credentials);
 
             if (!$token) {
-                return apiResponse(Message::ERROR, null, Response::HTTP_BAD_REQUEST);
+                return apiResponse('Username hoặc password không chính xác !', null, Response::HTTP_BAD_REQUEST);
             }
             $user = auth()->user()->makeHidden(['password']);
             

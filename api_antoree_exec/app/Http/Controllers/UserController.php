@@ -55,7 +55,7 @@ class UserController extends Controller
             return apiResponse(Message::CREATED_SUCCESS, $credentials, Response::HTTP_CREATED);
         } catch (ValidationException $e) {
 
-            return apiResponse($e->validator->errors()->first(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
+            return apiResponse($e->validator->errors(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 
@@ -64,9 +64,10 @@ class UserController extends Controller
      */
     public function showUser(string $userId)
     {
+        $user = User::find($userId);
+        
         try {
-            $response = User::find($userId);
-            return apiResponse(Message::SUCCESS_RECORD, $response, Response::HTTP_OK);
+            return apiResponse(Message::SUCCESS_RECORD, $user, Response::HTTP_OK);
 
         } catch (\Throwable $th) {
             return apiResponse(Message::ERROR, null, Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -78,35 +79,34 @@ class UserController extends Controller
      */
     public function editUser(Request $request, int $userId)
     {
-        $selfUser = auth()->user();
-        $user = User::find($userId);
-        if (!$user) {
-            return apiResponse(Message::NOT_FOUND, null, Response::HTTP_NOT_FOUND);
-        }
-
-        if ($selfUser->role == $user->role || $user->role == Role::SUPPERADMIN) {
-            return apiResponse(Message::UPDATED_ROLE, null, Response::HTTP_FORBIDDEN);
-        }
-        
-        if ($selfUser->id === $user->id && 
-            $selfUser->role === Role::SUPPERADMIN ||
-            $selfUser->role === Role::ADMIN
-        ) {
-            return apiResponse(Message::CHANGE_ROLE, null, Response::HTTP_FORBIDDEN);
-        }
-
+        $role = ['supper_admin' => 3, 'admin' => 2, 'user' => 1];
         try {
+            $selfUser = auth()->user();
+            $user = User::find($userId);
+            if (!$user) {
+                return apiResponse(Message::NOT_FOUND, null, Response::HTTP_NOT_FOUND);
+            }
+
             $credentials = $request->validate(
                 UserRule::userRules($userId),
                 UserRule::userMessages()
             );
+
+            if ($selfUser->id === $user->id) {
+                $this->userService->updateUser($credentials, $userId);
+                return apiResponse(Message::UPDATED_SUCCESS, null, Response::HTTP_OK);
+            }
+
+            if ($role[$selfUser->role] <= $role[$user->role]) {
+                return apiResponse(Message::UPDATED_ROLE, null, Response::HTTP_FORBIDDEN);
+            }
 
             $response = $this->userService->updateUser($credentials, $userId);
 
             return apiResponse(Message::UPDATED_SUCCESS, null, Response::HTTP_OK);
 
         } catch (ValidationException $e) {
-            return apiResponse($e->validator->errors()->first(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
+            return apiResponse($e->validator->errors(), null, Response::HTTP_UNPROCESSABLE_ENTITY);
 
         } 
         

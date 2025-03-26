@@ -1,52 +1,67 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Container,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-} from "@mui/material";
-
-import useAuth from '../hooks/useAuth';
+import { Container, TextField, Button, Typography, Box, Checkbox, FormControlLabel, FormGroup, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const {login} = useAuth();
+  const contextAuth = useAuth();
   const [showPassword, setShowPassword] = useState(true);
   const [formData, setFormData] = useState({name: '', password: ''});
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  
+  // console.log(contextAuth);
+  
 
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value});
   }
-  // console.log(formData);
-
+  
   const handleLogin = (e) => {
     e.preventDefault();
     
-    login(formData)
-        .then(res => {
-            navigate('/dashboard');
-        })
-        .catch(err => { 
-            
-            if (err.code === "ERR_NETWORK") {
-              alert('Lỗi kết nối server !');
-            }
-            if (err.status === 400) {
-              alert('Đăng nhập thất bại !');
-            }
-            setFormData({name: '', password: ''})
-            setErrors(err.response.data.message);
-        })
+    setLoading(true);
+
+    contextAuth.login(formData)
+      .then(res => {
+
+        const data = res.data.user;
+        return data
+      })
+      .then(user => {
+        console.log(user.role)
+
+        if (user.role == "user") {
+          navigate(`/profile`);
+        }else{
+
+          navigate('/dashboard');
+        }
+      })
+      .catch(err => {
+
+        if (err.code === "ERR_NETWORK") {
+          alert('Lỗi kết nối server !');
+        }
+        if (err.status === 400) {              
+          alert(err.response.data.message ?? 'Đăng nhập không thành công');
+        }
+        if (err.status === 500) {
+          alert(err.response.data.message ?? 'Lỗi hệ thống !');
+        }
+        // alert('sd')
+
+        setFormData({name: '', password: ''})
+        setErrors(err.response.data.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      })
+        
   }
-  console.log(formData.name)
 
   return (
     <Container maxWidth="xs">
@@ -108,8 +123,9 @@ export default function LoginPage() {
             color="primary"
             sx={{ mt: 2 }}
             type="submit"
+            disabled={loading}
             >
-            Đăng nhập
+              {loading ? <CircularProgress size={24} color="inherit" /> : "Đăng nhập"}
             </Button>
         </form>
       </Box>

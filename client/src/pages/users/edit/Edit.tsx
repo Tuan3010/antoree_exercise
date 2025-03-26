@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TextField, Button, Container, Typography, MenuItem, CircularProgress } from "@mui/material";
-import userApi from "../../../apis/userApi"; // API giả định
+import userApi from "../../../apis/UserApi"; 
 
 const EditPage = () => {
-  const { id } = useParams(); 
+  const { idUser } = useParams(); 
   const navigate = useNavigate();
   const [user, setUser] = useState({ name: '', age: '', phone: '', email: '' });
   const [loading, setLoading] = useState(false);
@@ -13,15 +13,23 @@ const EditPage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await userApi.getProfile(id);
-        console.log(data);
+        const { data } = await userApi.getProfile(idUser);
+
+        if (data.phone === null) {
+          data.phone = '';
+        }
+        if (data.age === null) {
+          data.age = '';
+        }
+
         setUser(data);
+
       } catch (error) {
         console.error("Lỗi lấy dữ liệu:", error);
       }
     };
     fetchUser();
-  }, [id]);
+  }, [idUser]);
 
   // Xử lý thay đổi input
   const handleChange = (e) => {
@@ -30,17 +38,31 @@ const EditPage = () => {
 
   // Xử lý submit
   const handleSubmit = async (e) => {
+
     e.preventDefault();
     setLoading(true);
+
     try {
-      await userApi.updateUser(id, user);
-      navigate("/dashboard"); // Chuyển hướng sau khi cập nhật
+      const {name, age, phone, email} = user;
+      const updateUser = {name, email};
+
+      if(age) updateUser.age = age;
+      if(phone) updateUser.phone = phone;
+
+
+      const response = await userApi.updateUser(idUser, updateUser);
+      alert(response.message);
+      
+      navigate("/dashboard"); 
+
     } catch (error) {
-      console.error("Lỗi cập nhật:", error);
+      if(error.status === 403)  alert(error.response.data.message ?? 'Lỗi 403');
+      if(error.status !== 403) alert('Lỗi cập nhật')
+      
     }
     setLoading(false);
   };
-  console.log(user.name, user.phone);
+
   return (
     <Container maxWidth="sm" sx={{marginTop: '30px'}}>
       <Typography variant="h5" gutterBottom>Chỉnh sửa thông tin</Typography>
@@ -66,7 +88,7 @@ const EditPage = () => {
         <TextField 
             label="Phone" 
             name="phone" 
-            // value={user.phone} 
+            value={user.phone} 
             onChange={handleChange} 
             fullWidth 
             margin="normal"
@@ -74,7 +96,7 @@ const EditPage = () => {
         <TextField 
             label="Email" 
             name="email" 
-            // value={user.email} 
+            value={user.email} 
             onChange={handleChange} 
             type="email" 
             fullWidth 

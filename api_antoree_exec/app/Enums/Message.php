@@ -8,7 +8,7 @@ final class Message extends Enum
 {
     const SUCCESS = 'Thành công!';
     const SUCCESS_RECORD = 'Lấy bản ghi thành công!';
-    const ERROR = 'Có lỗi xảy ra!';
+    const ERROR = 'Lỗi hệ thống !';
     const NOT_FOUND = 'Không tìm thấy dữ liệu!';
     const UNAUTHORIZED = 'Bạn không có quyền truy cập!';
     const FORBIDDEN = 'Truy cập bị từ chối!';
