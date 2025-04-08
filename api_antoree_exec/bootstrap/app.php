@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_auth' => AuthMiddleware::class,
             'role' => RoleMiddleware::class,
         ]);
+        // $middleware->append(\App\Http\Middleware\RedirectToApi::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

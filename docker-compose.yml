@@ -1,0 +1,49 @@
+volumes:
+  dbdata_antore:
+
+networks:
+  api_network:
+    driver: bridge
+
+services:
+  back-end:
+    container_name: laravel_app
+    build:
+      context: ./api_antoree_exec
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - api_network
+    depends_on:
+      - mysql
+    ports:
+      - 8000:8000
+  mysql:
+    container_name: db_container
+    image: mariadb:latest
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: 123456
+      MARIADB_DATABASE: db_database
+      MARIADB_USER: root
+      MARIADB_PASSWORD: 123456
+    volumes:
+      - dbdata_antore:/var/lib/mysql
+    networks:
+      - api_network
+    expose:
+      - 3306
+    ports:
+      - 3307:3306
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: react_app
+    restart: always
+    ports:
+      - "3000:80"
+    networks:
+      - api_network
+

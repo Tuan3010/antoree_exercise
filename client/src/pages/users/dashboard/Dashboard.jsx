@@ -6,9 +6,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { useEffect, useState } from 'react';
-import userApi from '../../../apis/UserApi';
+import userApi from '../../../apis/UserApi.js';
 import { Button } from '@mui/material';
-import DeleteBtn from '../../../components/DeleteBtn';
+import DeleteBtn from '../../../components/DeleteBtn.jsx';
 import { Link } from 'react-router-dom';
 
 
