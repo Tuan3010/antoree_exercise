@@ -5,6 +5,6 @@
 
 # GETTING START 
 
-Follow these step to set up and run project
+Follow these step to set up and run project j
 
 # 1. Clone the Repository
