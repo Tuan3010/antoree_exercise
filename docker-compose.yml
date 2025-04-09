@@ -8,6 +8,7 @@ networks:
 services:
   back-end:
     container_name: laravel_app
+    image: tuan3010/laravel_app:first
     build:
       context: ./api_antoree_exec
       dockerfile: Dockerfile
@@ -35,12 +36,12 @@ services:
       - 3306
     ports:
       - 3307:3306
-
   frontend:
+    container_name: react_app
+    image: tuan3010/react_app:first
     build:
       context: ./client
       dockerfile: Dockerfile
-    container_name: react_app
     restart: always
     ports:
       - "3000:80"
