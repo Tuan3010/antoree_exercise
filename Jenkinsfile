@@ -15,17 +15,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker compose build'
-                }
-            }
-        }
-
-        stage('Login DockerHub') {
-            steps {
-                script {
-                    withDockerRegistry(credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/') {
-                        echo "Logged in to Docker Hub"
-                    }
+                    sh 'docker --version'
                 }
             }
         }
