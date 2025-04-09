@@ -12,7 +12,13 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Tuan3010/antoree_exercise.git'
             }
         }
-        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh 'docker --version'
+                }
+            }
+        }
 
     }
 }
