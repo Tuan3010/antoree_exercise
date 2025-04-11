@@ -15,7 +15,13 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker-compose build'
+                    sh '''
+                        docker info
+                        docker version
+                        docker compose version
+                        curl --version
+                        jq --version
+                    '''
                 }
             }
         }
