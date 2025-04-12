@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'tuan3010/laravel_app'
+        IMAGE_NAME_FONTEND = 'tuan3010/react_app'
+        IMAGE_NAME_BACKEND = 'tuan3010/laravel_app'
         DOCKER_CREDENTIALS = 'docker-hub-credentials'
         DOCKER_TAG = 'latest'
     }
@@ -28,13 +29,14 @@ pipeline {
             }
         }
 
+        stage('Docker Push') {
+            step {
+                sh "docker push ${IMAGE_NAME_FONTEND}:${DOCKER_TAG}"
+                sh "docker push ${IMAGE_NAME_BACKEND}:${DOCKER_TAG}"
+            }
+        }
+
     }
 
-    post {
-        always {
-            // Đăng xuất khỏi Docker Hub và xóa image cục bộ để dọn dẹp
-            sh 'docker logout'
-            sh 'echo Thành công'
-        }
-    }
+    
 }
