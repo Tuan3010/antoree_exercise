@@ -12,7 +12,6 @@ pipeline {
                 script {
                     sh '''
                         docker info
-                        docker version
                     '''
                 }
             }
