@@ -30,7 +30,7 @@ pipeline {
         }
 
         stage('Docker Push') {
-            step {
+            steps {
                 sh "docker push ${IMAGE_NAME_FONTEND}:${DOCKER_TAG}"
                 sh "docker push ${IMAGE_NAME_BACKEND}:${DOCKER_TAG}"
             }
